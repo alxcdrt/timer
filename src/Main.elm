@@ -1,10 +1,11 @@
-module Main exposing (..)
+module Main exposing (main)
 
 import Browser
 import Time
 import Html exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Html.Attributes exposing (type_, id, value, class)
+import Html.Attributes exposing (disabled)
 
 
 -- MAIN
@@ -19,15 +20,21 @@ main =
 
 -- MODEL
 
+type State
+    = Waiting
+    | Stopped
+    | Running
+    | Ended
+
 type alias Model = 
     { currentTime : Int
     , startTime : String
-    , tick : Int
+    , state : State
     }
 
 init : () -> (Model, Cmd Msg)
 init _ =
-    (Model 0 "05:00" 0
+    (Model 0 "05:00" Waiting
     , Cmd.none
     )
 
@@ -39,22 +46,23 @@ type Msg
     | Tick Time.Posix
     | Update String
 
+
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
 
     case msg of 
         Tick _ ->
-            ( { model | currentTime = model.currentTime - model.tick, tick = if model.currentTime - model.tick <= 0 || model.tick == 0 then 0 else 1 }
+            ( { model | currentTime = model.currentTime - 1 } |> checkEnded
             , Cmd.none
             )
 
         Start ->
-            ( { model | currentTime = String.split ":" model.startTime |> sumTime, tick = 1 }
+            ( { model | currentTime = String.split ":" model.startTime |> sumTime, state = Running } |> validateStart
             , Cmd.none
             )
 
         Pause ->
-            ( { model | tick = if model.tick == 0 && model.currentTime > 0 then 1 else 0 }
+            ( { model | state = if model.state == Stopped then Running else Stopped }
             , Cmd.none
             )
 
@@ -62,6 +70,12 @@ update msg model =
             ( { model |  startTime = newTime }
             , Cmd.none 
             )
+
+validateStart : Model -> Model
+validateStart model =
+    case model.currentTime of
+        0 -> Model 0 model.startTime Waiting
+        _ -> model
 
 
 sumTime : List String -> Int
@@ -76,12 +90,17 @@ parseString a =
         Nothing -> 0
         Just n -> n
 
+checkEnded : Model -> Model
+checkEnded model = 
+    if model.currentTime <= 0 then { model | state = Ended } else model
 
 -- SUBSCRIPTIONS
 
 subscriptions : Model -> Sub Msg
-subscriptions _ =
-    Time.every 1000 Tick
+subscriptions model =
+    case model.state of
+        Running -> Time.every 1000 Tick
+        _ -> Sub.none
 
 -- VIEW
 
@@ -97,5 +116,15 @@ view model =
             ]
             , input [ id "time-input", type_ "time", value model.startTime, onInput Update ] []
             , button [ onClick Start ] [ text "Start" ]
-            , button [ onClick Pause ] [ text "Pause" ]
+            , button [ onClick Pause, disabled (cantBePaused model.state) ] [ text (pauseButtonText model.state) ]
         ]
+
+cantBePaused : State -> Bool
+cantBePaused state = state /= Running && state /= Stopped
+
+
+pauseButtonText : State -> String
+pauseButtonText state =
+    case state of
+        Stopped -> "Continue"
+        _ -> "Pause"
