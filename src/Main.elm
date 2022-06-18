@@ -1,12 +1,12 @@
-module Main exposing (main)
+port module Main exposing (main)
 
 import Browser
 import Time
 import Html exposing (..)
 import Html.Events exposing (onClick, onInput)
-import Html.Attributes exposing (type_, id, value, class)
-import Html.Attributes exposing (disabled)
+import Html.Attributes exposing (type_, id, value, class, disabled)
 
+port playSound : String -> Cmd msg
 
 -- MAIN
 
@@ -52,9 +52,7 @@ update msg model =
 
     case msg of 
         Tick _ ->
-            ( { model | currentTime = model.currentTime - 1 } |> checkEnded
-            , Cmd.none
-            )
+            { model | currentTime = model.currentTime - 1 } |> checkEnded
 
         Start ->
             ( { model | currentTime = String.split ":" model.startTime |> sumTime, state = Running } |> validateStart
@@ -90,9 +88,11 @@ parseString a =
         Nothing -> 0
         Just n -> n
 
-checkEnded : Model -> Model
+checkEnded : Model -> (Model, Cmd Msg)
 checkEnded model = 
-    if model.currentTime <= 0 then { model | state = Ended } else model
+    if model.currentTime <= 0 
+    then ({ model | state = Ended }, playSound "end")
+    else (model, Cmd.none)
 
 -- SUBSCRIPTIONS
 

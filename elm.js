@@ -5640,10 +5640,14 @@ var $author$project$Main$subscriptions = function (model) {
 var $author$project$Main$Running = 2;
 var $author$project$Main$Stopped = 1;
 var $author$project$Main$Ended = 3;
+var $elm$json$Json$Encode$string = _Json_wrap;
+var $author$project$Main$playSound = _Platform_outgoingPort('playSound', $elm$json$Json$Encode$string);
 var $author$project$Main$checkEnded = function (model) {
-	return (model.n <= 0) ? _Utils_update(
-		model,
-		{q: 3}) : model;
+	return (model.n <= 0) ? _Utils_Tuple2(
+		_Utils_update(
+			model,
+			{q: 3}),
+		$author$project$Main$playSound('end')) : _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 };
 var $author$project$Main$parseString = function (a) {
 	var _v0 = $elm$core$String$toInt(a);
@@ -5676,12 +5680,10 @@ var $author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
 			case 2:
-				return _Utils_Tuple2(
-					$author$project$Main$checkEnded(
-						_Utils_update(
-							model,
-							{n: model.n - 1})),
-					$elm$core$Platform$Cmd$none);
+				return $author$project$Main$checkEnded(
+					_Utils_update(
+						model,
+						{n: model.n - 1}));
 			case 0:
 				return _Utils_Tuple2(
 					$author$project$Main$validateStart(
@@ -5720,7 +5722,6 @@ var $elm$core$Basics$neq = _Utils_notEqual;
 var $author$project$Main$cantBePaused = function (state) {
 	return (state !== 2) && (state !== 1);
 };
-var $elm$json$Json$Encode$string = _Json_wrap;
 var $elm$html$Html$Attributes$stringProperty = F2(
 	function (key, string) {
 		return A2(
