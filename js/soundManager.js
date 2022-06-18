@@ -1,5 +1,5 @@
 const sounds = {
-    end: new Howl({ src: ['../assets/sounds/alarm.mp3']})
+    end: new Howl({ src: ['./assets/sounds/alarm.mp3']})
 }
 
 function ring(key) {
