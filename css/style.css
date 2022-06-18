@@ -1,16 +1,26 @@
 @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
 
+body {
+  background-color: grey;
+}
+
+.clock-container {
+  position: absolute;
+  left: 50%;
+  top: 25%;
+  transform: translateX(-50%);
+}
+
 .clock {
   font-family: 'Orbitron', sans-serif;
   font-size: 60px;
   background-color: #212121;
-  color: #64DD17;
-  position: absolute;
-  left: 50%;
-  top: 50%;
   width: 500px;
   height: 150px;
-  transform: translate(-50%, -50%);
+  border-width: 5px;
+  border-color: rgba(255, 196, 0, 0.322);
+  border-style: solid;
+  border-radius: 20%;
 }
 
 .time {
@@ -18,4 +28,62 @@
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
+  color: #64DD17;
+}
+
+.time-ending {
+  color: #dd1717;
+}
+
+.time-paused {
+  animation-name: paused-animation;
+  animation-duration: 2s;
+  animation-iteration-count: infinite;
+  animation-timing-function: step-end;
+}
+
+@keyframes paused-animation {
+  0% { opacity: 100%; }
+  50% { opacity: 0%; }
+}
+
+.clock-settings {
+  position: absolute;
+  width: 500px;
+  margin-top: 10px;
+  text-align: center;
+}
+
+.clock-settings-button {
+  border-width: 1px;
+  border-radius: 10%;
+  height: 35px;
+  width: 70px;
+  margin-left: 1%;
+  margin-right: 1%;
+}
+
+.clock-settings-start-button {
+  background-color: #00cc00;
+  border-color: #003300;
+}
+
+.clock-settings-start-button:hover {
+  background-color: #009900;
+}
+
+.clock-settings-pause-button {
+  background-color: #ff9933;
+  border-color: #994d00;
+}
+
+.clock-settings-pause-button:hover {
+  background-color: #e67300;
+}
+
+.clock-settings-input-time {
+  margin-top: 2%;
+  font-size: 20px;
+  text-align: center;
+
 }

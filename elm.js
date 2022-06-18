@@ -2719,7 +2719,7 @@ var _VirtualDom_mapEventTuple = F2(function(func, tuple)
 var _VirtualDom_mapEventRecord = F2(function(func, record)
 {
 	return {
-		o: func(record.o),
+		p: func(record.p),
 		L: record.L,
 		I: record.I
 	}
@@ -2989,7 +2989,7 @@ function _VirtualDom_makeCallback(eventNode, initialHandler)
 		// 3 = Custom
 
 		var value = result.a;
-		var message = !tag ? value : tag < 3 ? value.a : value.o;
+		var message = !tag ? value : tag < 3 ? value.a : value.p;
 		var stopPropagation = tag == 1 ? value.b : tag == 3 && value.L;
 		var currentEventNode = (
 			stopPropagation && event.stopPropagation(),
@@ -5201,7 +5201,7 @@ var $elm$core$Task$perform = F2(
 var $elm$browser$Browser$element = _Browser_element;
 var $author$project$Main$Model = F3(
 	function (currentTime, startTime, state) {
-		return {n: currentTime, B: startTime, q: state};
+		return {k: currentTime, B: startTime, m: state};
 	});
 var $author$project$Main$Waiting = 0;
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
@@ -5630,7 +5630,7 @@ var $elm$time$Time$every = F2(
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $author$project$Main$subscriptions = function (model) {
-	var _v0 = model.q;
+	var _v0 = model.m;
 	if (_v0 === 2) {
 		return A2($elm$time$Time$every, 1000, $author$project$Main$Tick);
 	} else {
@@ -5643,10 +5643,10 @@ var $author$project$Main$Ended = 3;
 var $elm$json$Json$Encode$string = _Json_wrap;
 var $author$project$Main$playSound = _Platform_outgoingPort('playSound', $elm$json$Json$Encode$string);
 var $author$project$Main$checkEnded = function (model) {
-	return (model.n <= 0) ? _Utils_Tuple2(
+	return (model.k <= 0) ? _Utils_Tuple2(
 		_Utils_update(
 			model,
-			{q: 3}),
+			{m: 3}),
 		$author$project$Main$playSound('end')) : _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 };
 var $author$project$Main$parseString = function (a) {
@@ -5669,7 +5669,7 @@ var $author$project$Main$sumTime = function (list) {
 	}
 };
 var $author$project$Main$validateStart = function (model) {
-	var _v0 = model.n;
+	var _v0 = model.k;
 	if (!_v0) {
 		return A3($author$project$Main$Model, 0, model.B, 0);
 	} else {
@@ -5683,16 +5683,16 @@ var $author$project$Main$update = F2(
 				return $author$project$Main$checkEnded(
 					_Utils_update(
 						model,
-						{n: model.n - 1}));
+						{k: model.k - 1}));
 			case 0:
 				return _Utils_Tuple2(
 					$author$project$Main$validateStart(
 						_Utils_update(
 							model,
 							{
-								n: $author$project$Main$sumTime(
+								k: $author$project$Main$sumTime(
 									A2($elm$core$String$split, ':', model.B)),
-								q: 2
+								m: 2
 							})),
 					$elm$core$Platform$Cmd$none);
 			case 1:
@@ -5700,7 +5700,7 @@ var $author$project$Main$update = F2(
 					_Utils_update(
 						model,
 						{
-							q: (model.q === 1) ? 2 : 1
+							m: (model.m === 1) ? 2 : 1
 						}),
 					$elm$core$Platform$Cmd$none);
 			default:
@@ -5740,7 +5740,6 @@ var $elm$html$Html$Attributes$boolProperty = F2(
 	});
 var $elm$html$Html$Attributes$disabled = $elm$html$Html$Attributes$boolProperty('disabled');
 var $elm$html$Html$div = _VirtualDom_node('div');
-var $elm$html$Html$Attributes$id = $elm$html$Html$Attributes$stringProperty('id');
 var $elm$html$Html$input = _VirtualDom_node('input');
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 0, a: a};
@@ -5792,6 +5791,7 @@ var $elm$html$Html$Events$onInput = function (tagger) {
 			$elm$html$Html$Events$alwaysStop,
 			A2($elm$json$Json$Decode$map, tagger, $elm$html$Html$Events$targetValue)));
 };
+var $author$project$Main$pauseButtonClasses = $elm$html$Html$Attributes$class('clock-settings-button clock-settings-pause-button');
 var $author$project$Main$pauseButtonText = function (state) {
 	if (state === 1) {
 		return 'Continue';
@@ -5799,13 +5799,18 @@ var $author$project$Main$pauseButtonText = function (state) {
 		return 'Pause';
 	}
 };
+var $author$project$Main$startButtonClasses = $elm$html$Html$Attributes$class('clock-settings-button clock-settings-start-button');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$html$Html$text = $elm$virtual_dom$VirtualDom$text;
+var $author$project$Main$timeClasses = function (model) {
+	return $elm$html$Html$Attributes$class(
+		'time' + (((model.k <= 10) ? ' time-ending' : '') + ((model.m === 1) ? ' time-paused' : '')));
+};
 var $elm$html$Html$Attributes$type_ = $elm$html$Html$Attributes$stringProperty('type');
 var $elm$html$Html$Attributes$value = $elm$html$Html$Attributes$stringProperty('value');
 var $author$project$Main$view = function (model) {
-	var seconds = $elm$core$String$fromInt(model.n % 60);
-	var minutes = $elm$core$String$fromInt((model.n / 60) | 0);
+	var seconds = $elm$core$String$fromInt(model.k % 60);
+	var minutes = $elm$core$String$fromInt((model.k / 60) | 0);
 	return A2(
 		$elm$html$Html$div,
 		_List_Nil,
@@ -5815,7 +5820,7 @@ var $author$project$Main$view = function (model) {
 				$elm$html$Html$div,
 				_List_fromArray(
 					[
-						$elm$html$Html$Attributes$class('clock')
+						$elm$html$Html$Attributes$class('clock-container')
 					]),
 				_List_fromArray(
 					[
@@ -5823,45 +5828,71 @@ var $author$project$Main$view = function (model) {
 						$elm$html$Html$div,
 						_List_fromArray(
 							[
-								$elm$html$Html$Attributes$class('time')
+								$elm$html$Html$Attributes$class('clock')
 							]),
 						_List_fromArray(
 							[
-								$elm$html$Html$text(minutes + (' : ' + seconds))
+								A2(
+								$elm$html$Html$div,
+								_List_fromArray(
+									[
+										$author$project$Main$timeClasses(model)
+									]),
+								_List_fromArray(
+									[
+										$elm$html$Html$text(minutes + (' : ' + seconds))
+									]))
+							])),
+						A2(
+						$elm$html$Html$div,
+						_List_fromArray(
+							[
+								$elm$html$Html$Attributes$class('clock-settings')
+							]),
+						_List_fromArray(
+							[
+								A2(
+								$elm$html$Html$div,
+								_List_Nil,
+								_List_fromArray(
+									[
+										A2(
+										$elm$html$Html$button,
+										_List_fromArray(
+											[
+												$author$project$Main$startButtonClasses,
+												$elm$html$Html$Events$onClick($author$project$Main$Start)
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text('Start')
+											])),
+										A2(
+										$elm$html$Html$button,
+										_List_fromArray(
+											[
+												$author$project$Main$pauseButtonClasses,
+												$elm$html$Html$Events$onClick($author$project$Main$Pause),
+												$elm$html$Html$Attributes$disabled(
+												$author$project$Main$cantBePaused(model.m))
+											]),
+										_List_fromArray(
+											[
+												$elm$html$Html$text(
+												$author$project$Main$pauseButtonText(model.m))
+											]))
+									])),
+								A2(
+								$elm$html$Html$input,
+								_List_fromArray(
+									[
+										$elm$html$Html$Attributes$class('clock-settings-input-time'),
+										$elm$html$Html$Attributes$type_('time'),
+										$elm$html$Html$Attributes$value(model.B),
+										$elm$html$Html$Events$onInput($author$project$Main$Update)
+									]),
+								_List_Nil)
 							]))
-					])),
-				A2(
-				$elm$html$Html$input,
-				_List_fromArray(
-					[
-						$elm$html$Html$Attributes$id('time-input'),
-						$elm$html$Html$Attributes$type_('time'),
-						$elm$html$Html$Attributes$value(model.B),
-						$elm$html$Html$Events$onInput($author$project$Main$Update)
-					]),
-				_List_Nil),
-				A2(
-				$elm$html$Html$button,
-				_List_fromArray(
-					[
-						$elm$html$Html$Events$onClick($author$project$Main$Start)
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text('Start')
-					])),
-				A2(
-				$elm$html$Html$button,
-				_List_fromArray(
-					[
-						$elm$html$Html$Events$onClick($author$project$Main$Pause),
-						$elm$html$Html$Attributes$disabled(
-						$author$project$Main$cantBePaused(model.q))
-					]),
-				_List_fromArray(
-					[
-						$elm$html$Html$text(
-						$author$project$Main$pauseButtonText(model.q))
 					]))
 			]));
 };

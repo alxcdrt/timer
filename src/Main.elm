@@ -4,7 +4,7 @@ import Browser
 import Time
 import Html exposing (..)
 import Html.Events exposing (onClick, onInput)
-import Html.Attributes exposing (type_, id, value, class, disabled)
+import Html.Attributes exposing (type_, value, class, disabled)
 
 port playSound : String -> Cmd msg
 
@@ -110,13 +110,19 @@ view model =
         minutes = String.fromInt (model.currentTime // 60)
         seconds = String.fromInt (remainderBy 60 model.currentTime)
     in
-    div [] [
-        div [class "clock"]
-            [ div [class "time"] [ text (minutes ++ " : " ++ seconds) ]
+    div [] 
+        [ div [class "clock-container"]
+            [ div [class "clock"]
+                [ div [ timeClasses model ] [ text (minutes ++ " : " ++ seconds) ]
+                ]
+            , div [class "clock-settings"]
+                [ div [] 
+                    [ button [ startButtonClasses, onClick Start ] [ text "Start" ]
+                    , button [ pauseButtonClasses, onClick Pause, disabled (cantBePaused model.state) ] [ text (pauseButtonText model.state) ]
+                    ]
+                , input [ class "clock-settings-input-time", type_ "time", value model.startTime, onInput Update ] []
+                ]
             ]
-            , input [ id "time-input", type_ "time", value model.startTime, onInput Update ] []
-            , button [ onClick Start ] [ text "Start" ]
-            , button [ onClick Pause, disabled (cantBePaused model.state) ] [ text (pauseButtonText model.state) ]
         ]
 
 cantBePaused : State -> Bool
@@ -128,3 +134,17 @@ pauseButtonText state =
     case state of
         Stopped -> "Continue"
         _ -> "Pause"
+
+startButtonClasses : Attribute Msg
+startButtonClasses = class "clock-settings-button clock-settings-start-button"
+
+pauseButtonClasses : Attribute Msg
+pauseButtonClasses = class "clock-settings-button clock-settings-pause-button"
+
+timeClasses : Model -> Attribute Msg
+timeClasses model = 
+    class (
+            "time" 
+            ++ ( if model.currentTime <= 10 then " time-ending" else "" )
+            ++ ( if model.state == Stopped then " time-paused" else "" ) )
+            
