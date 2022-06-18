@@ -85,5 +85,18 @@ body {
   margin-top: 2%;
   font-size: 20px;
   text-align: center;
+}
 
+footer {
+  position: fixed;
+  bottom: 0px;
+  margin: 10px;
+}
+
+.github-link {
+  text-decoration: none;
+}
+
+.github-link:visited {
+  color: inherit;
 }
