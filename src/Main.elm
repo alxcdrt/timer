@@ -4,7 +4,7 @@ import Browser
 import Time
 import Html exposing (..)
 import Html.Events exposing (onClick, onInput)
-import Html.Attributes exposing (type_, value, class, disabled)
+import Html.Attributes as A exposing (type_, value, class, disabled)
 
 port playSound : String -> Cmd msg
 
@@ -26,15 +26,21 @@ type State
     | Running
     | Ended
 
+type alias RawTime = 
+    {
+        minutes : String,
+        seconds : String
+    }
+
 type alias Model = 
     { currentTime : Int
-    , startTime : String
+    , startTime : RawTime
     , state : State
     }
 
 init : () -> (Model, Cmd Msg)
 init _ =
-    (Model 0 "05:00" Waiting
+    ( Model 0 (RawTime "5" "0") Waiting
     , Cmd.none
     )
 
@@ -44,18 +50,21 @@ type Msg
     = Start
     | Pause
     | Tick Time.Posix
-    | Update String
+    | Update TimeMsg String
+
+type TimeMsg
+    = Seconds
+    | Minutes
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
-
     case msg of 
         Tick _ ->
             { model | currentTime = model.currentTime - 1 } |> checkEnded
 
         Start ->
-            ( { model | currentTime = String.split ":" model.startTime |> sumTime, state = Running } |> validateStart
+            ( { model | currentTime = parseTimeRaw model.startTime, state = Running } |> validateStart
             , Cmd.none
             )
 
@@ -64,29 +73,31 @@ update msg model =
             , Cmd.none
             )
 
-        Update newTime ->
-            ( { model |  startTime = newTime }
+        Update timeMsg newValue ->
+            ( updateTime timeMsg model newValue
             , Cmd.none 
             )
+
+
+updateTime : TimeMsg -> Model -> String -> Model
+updateTime msg model newValue =
+    case msg of
+        Minutes -> { model | startTime = RawTime newValue model.startTime.seconds }
+        Seconds -> { model | startTime = RawTime model.startTime.minutes newValue }
+
+
 
 validateStart : Model -> Model
 validateStart model =
     case model.currentTime of
-        0 -> Model 0 model.startTime Waiting
+        0 -> Model 0 (RawTime "5" "0") Waiting
         _ -> model
 
 
-sumTime : List String -> Int
-sumTime list =
-    case list of 
-        (h :: m :: _) -> (parseString h * 60) + parseString m
-        _ -> 0
+parseTimeRaw : RawTime -> Int
+parseTimeRaw startTime =  
+    ( Maybe.withDefault 0 (String.toInt startTime.minutes) ) * 60 + ( Maybe.withDefault 0 (String.toInt startTime.seconds) ) 
 
-parseString : String -> Int
-parseString a =
-    case String.toInt a of
-        Nothing -> 0
-        Just n -> n
 
 checkEnded : Model -> (Model, Cmd Msg)
 checkEnded model = 
@@ -120,7 +131,8 @@ view model =
                     [ button [ startButtonClasses, onClick Start ] [ text "Start" ]
                     , button [ pauseButtonClasses, onClick Pause, disabled (cantBePaused model.state) ] [ text (pauseButtonText model.state) ]
                     ]
-                , input [ class "clock-settings-input-time", type_ "time", value model.startTime, onInput Update ] []
+                , input [ class "clock-settings-input-time", type_ "number", A.min "0", A.max "120", value model.startTime.minutes, onInput (Update Minutes) ] []
+                , input [ class "clock-settings-input-time", type_ "number", A.min "0", A.max "60", value model.startTime.seconds, onInput (Update Seconds) ] []
                 ]
             ]
         ]
